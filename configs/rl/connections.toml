@@ -1,0 +1,37 @@
+model = "Qwen/Qwen3-8B"
+max_steps = 300
+batch_size = 128
+rollouts_per_example = 8
+oversampling_factor = 2.0
+# env_file = ["secrets.env"]  # uncomment if keys aren't in environment
+
+[sampling]
+max_tokens = 2048
+# Disable extended thinking for qwen3 — keeps responses short and token costs low.
+# Remove this block if you want the model to reason in <think> tags.
+extra_body = { thinking = { type = "disabled" } }
+
+[[env]]
+id = "lswamina/connections"
+args = { split = "train" }
+
+[wandb]
+project = "connections"
+name = "qwen3-8b-connections-v1"
+
+# Online eval every 50 steps against held-out 2025 puzzles
+[eval]
+interval = 50
+num_examples = 30
+rollouts_per_example = 1
+
+[[eval.env]]
+id = "lswamina/connections"
+args = { split = "eval" }
+
+# Difficulty filtering: skip examples the model already solves reliably (reward > 0.9)
+# or can never solve (reward < 0.05). Keeps training signal meaningful.
+[buffer]
+online_difficulty_filtering = true
+easy_threshold = 0.9
+hard_threshold = 0.05

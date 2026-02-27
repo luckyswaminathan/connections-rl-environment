@@ -4,3 +4,10 @@
 2026-02-27 15:52:28 - verifiers.utils.env_utils - INFO - Using default args: seed=42, split='train', num_examples=-1
 2026-02-27 15:52:28 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'connections'
 2026-02-27 15:52:28 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - ZMQEnvServer started on tcp://127.0.0.1:59771
+2026-02-27 15:56:05 - verifiers.envs.environment.ConnectionsEnv - ERROR - Aborted rollout due to EmptyModelResponseError('Model returned no content and did not call any tools')
+2026-02-27 15:57:05 - verifiers.envs.environment.ConnectionsEnv - ERROR - Aborted rollout due to EmptyModelResponseError('Model returned no content and did not call any tools')
+2026-02-27 15:57:48 - verifiers.envs.environment.ConnectionsEnv - ERROR - Aborted rollout due to EmptyModelResponseError('Model returned no content and did not call any tools')
+2026-02-27 15:58:41 - verifiers.envs.environment.ConnectionsEnv - ERROR - Aborted rollout due to EmptyModelResponseError('Model returned no content and did not call any tools')
+2026-02-27 15:58:57 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Received signal SIGTERM, initiating graceful shutdown
+2026-02-27 15:58:58 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Stop event received, shutting down gracefully
+2026-02-27 15:58:58 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Environment server shut down
