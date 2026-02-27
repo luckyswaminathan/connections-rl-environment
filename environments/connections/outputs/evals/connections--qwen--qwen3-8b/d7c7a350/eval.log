@@ -1,0 +1,40 @@
+2026-02-27 15:49:35 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Initializing ZMQEnvServer to serve connections (env_args={}, extra_env_kwargs={})
+2026-02-27 15:49:35 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Loading environment connections with env_args={}
+2026-02-27 15:49:35 - verifiers.utils.env_utils - INFO - Loading environment: connections
+2026-02-27 15:49:35 - verifiers.utils.env_utils - INFO - Using default args: seed=42, split='train', num_examples=-1
+2026-02-27 15:49:35 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'connections'
+2026-02-27 15:49:35 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - ZMQEnvServer started on tcp://127.0.0.1:59656
+2026-02-27 15:50:27 - verifiers.workers.server.env_server.ZMQEnvServer - ERROR - Error processing request 5ad73fd457264fd383a9e7903cfc0274: expected string or bytes-like object, got 'list'
+Traceback (most recent call last):
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/workers/server/zmq_env_server.py", line 116, in _process_request
+    response = await self._handle_run_group(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/workers/server/env_server.py", line 119, in _handle_run_group
+    outputs = await self.env.run_group(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/envs/environment.py", line 952, in run_group
+    group_states = await maybe_retry(
+                   ^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/envs/environment.py", line 943, in run_group_attempt
+    group_states = await asyncio.gather(*rollout_tasks)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/envs/multiturn_env.py", line 146, in rollout
+    prompt_messages = await self.get_prompt_messages(state)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/envs/multiturn_env.py", line 81, in get_prompt_messages
+    env_response = await self.env_response(messages, state)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/environments/connections/connections.py", line 109, in env_response
+    parsed = self.parser.parse(messages)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/parsers/xml_parser.py", line 82, in parse
+    match = re.search(pattern, text, re.DOTALL)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/re/__init__.py", line 177, in search
+    return _compile(pattern, flags).search(string)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: expected string or bytes-like object, got 'list'
+2026-02-27 15:50:27 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Received signal SIGTERM, initiating graceful shutdown
+2026-02-27 15:50:27 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Stop event received, shutting down gracefully
+2026-02-27 15:50:27 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Cancelling 4 pending tasks
+2026-02-27 15:50:27 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Environment server shut down

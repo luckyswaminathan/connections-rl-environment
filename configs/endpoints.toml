@@ -1,4 +1,11 @@
 [[endpoint]]
+endpoint_id = "qwen3-8b"
+model = "qwen/qwen3-8b"
+url = "https://api.pinference.ai/api/v1"
+key = "PRIME_API_KEY"
+type = "openai_chat_completions"
+
+[[endpoint]]
 endpoint_id = "olmo3-32b-t"
 model = "allenai/olmo-3-32b-think"
 url = "https://api.pinference.ai/api/v1"

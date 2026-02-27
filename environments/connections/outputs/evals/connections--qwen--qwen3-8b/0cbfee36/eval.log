@@ -1,0 +1,124 @@
+2026-02-27 15:46:52 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Initializing ZMQEnvServer to serve connections (env_args={}, extra_env_kwargs={})
+2026-02-27 15:46:52 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Loading environment connections with env_args={}
+2026-02-27 15:46:52 - verifiers.utils.env_utils - INFO - Loading environment: connections
+2026-02-27 15:46:52 - verifiers.utils.env_utils - INFO - Using default args: num_examples=-1, split='train', seed=42
+2026-02-27 15:46:53 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'connections'
+2026-02-27 15:46:53 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - ZMQEnvServer started on tcp://127.0.0.1:59545
+2026-02-27 15:46:53 - verifiers.workers.server.env_server.ZMQEnvServer - ERROR - Error processing request f137a72e370747788ed444ef3878c364: the JSON object must be str, bytes or bytearray, not dict
+Traceback (most recent call last):
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/workers/server/zmq_env_server.py", line 116, in _process_request
+    response = await self._handle_run_group(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/workers/server/env_server.py", line 119, in _handle_run_group
+    outputs = await self.env.run_group(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/envs/environment.py", line 952, in run_group
+    group_states = await maybe_retry(
+                   ^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/envs/environment.py", line 943, in run_group_attempt
+    group_states = await asyncio.gather(*rollout_tasks)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/envs/multiturn_env.py", line 140, in rollout
+    state = await self.setup_state(state)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/environments/connections/connections.py", line 84, in setup_state
+    info = json.loads(state["info"])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/__init__.py", line 339, in loads
+    raise TypeError(f'the JSON object must be str, bytes or bytearray, '
+TypeError: the JSON object must be str, bytes or bytearray, not dict
+2026-02-27 15:46:53 - verifiers.workers.server.env_server.ZMQEnvServer - ERROR - Error processing request 34152eda29d6437e89ca13dcf60818c5: the JSON object must be str, bytes or bytearray, not dict
+Traceback (most recent call last):
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/workers/server/zmq_env_server.py", line 116, in _process_request
+    response = await self._handle_run_group(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/workers/server/env_server.py", line 119, in _handle_run_group
+    outputs = await self.env.run_group(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/envs/environment.py", line 952, in run_group
+    group_states = await maybe_retry(
+                   ^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/envs/environment.py", line 943, in run_group_attempt
+    group_states = await asyncio.gather(*rollout_tasks)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/envs/multiturn_env.py", line 140, in rollout
+    state = await self.setup_state(state)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/environments/connections/connections.py", line 84, in setup_state
+    info = json.loads(state["info"])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/__init__.py", line 339, in loads
+    raise TypeError(f'the JSON object must be str, bytes or bytearray, '
+TypeError: the JSON object must be str, bytes or bytearray, not dict
+2026-02-27 15:46:53 - verifiers.workers.server.env_server.ZMQEnvServer - ERROR - Error processing request f99a21d78454497083bcc185920e9e90: the JSON object must be str, bytes or bytearray, not dict
+Traceback (most recent call last):
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/workers/server/zmq_env_server.py", line 116, in _process_request
+    response = await self._handle_run_group(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/workers/server/env_server.py", line 119, in _handle_run_group
+    outputs = await self.env.run_group(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/envs/environment.py", line 952, in run_group
+    group_states = await maybe_retry(
+                   ^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/envs/environment.py", line 943, in run_group_attempt
+    group_states = await asyncio.gather(*rollout_tasks)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/envs/multiturn_env.py", line 140, in rollout
+    state = await self.setup_state(state)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/environments/connections/connections.py", line 84, in setup_state
+    info = json.loads(state["info"])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/__init__.py", line 339, in loads
+    raise TypeError(f'the JSON object must be str, bytes or bytearray, '
+TypeError: the JSON object must be str, bytes or bytearray, not dict
+2026-02-27 15:46:53 - verifiers.workers.server.env_server.ZMQEnvServer - ERROR - Error processing request 5cfbfc7556eb43ef8c2a6bb131b177d6: the JSON object must be str, bytes or bytearray, not dict
+Traceback (most recent call last):
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/workers/server/zmq_env_server.py", line 116, in _process_request
+    response = await self._handle_run_group(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/workers/server/env_server.py", line 119, in _handle_run_group
+    outputs = await self.env.run_group(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/envs/environment.py", line 952, in run_group
+    group_states = await maybe_retry(
+                   ^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/envs/environment.py", line 943, in run_group_attempt
+    group_states = await asyncio.gather(*rollout_tasks)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/envs/multiturn_env.py", line 140, in rollout
+    state = await self.setup_state(state)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/environments/connections/connections.py", line 84, in setup_state
+    info = json.loads(state["info"])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/__init__.py", line 339, in loads
+    raise TypeError(f'the JSON object must be str, bytes or bytearray, '
+TypeError: the JSON object must be str, bytes or bytearray, not dict
+2026-02-27 15:46:53 - verifiers.workers.server.env_server.ZMQEnvServer - ERROR - Error processing request 1cc3086c091648339666c687d72e88e5: the JSON object must be str, bytes or bytearray, not dict
+Traceback (most recent call last):
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/workers/server/zmq_env_server.py", line 116, in _process_request
+    response = await self._handle_run_group(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/workers/server/env_server.py", line 119, in _handle_run_group
+    outputs = await self.env.run_group(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/envs/environment.py", line 952, in run_group
+    group_states = await maybe_retry(
+                   ^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/envs/environment.py", line 943, in run_group_attempt
+    group_states = await asyncio.gather(*rollout_tasks)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/.venv/lib/python3.12/site-packages/verifiers/envs/multiturn_env.py", line 140, in rollout
+    state = await self.setup_state(state)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/luckyswaminathan/Desktop/connections-rl-environment/environments/connections/connections.py", line 84, in setup_state
+    info = json.loads(state["info"])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/__init__.py", line 339, in loads
+    raise TypeError(f'the JSON object must be str, bytes or bytearray, '
+TypeError: the JSON object must be str, bytes or bytearray, not dict
+2026-02-27 15:46:53 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Received signal SIGTERM, initiating graceful shutdown
+2026-02-27 15:46:54 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Stop event received, shutting down gracefully
+2026-02-27 15:46:54 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Environment server shut down
