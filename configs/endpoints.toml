@@ -42,7 +42,7 @@ type = "anthropic_messages"
 
 [[endpoint]]
 endpoint_id = "sonnet"
-model = "claude-sonnet-4-5"
+model = "claude-sonnet-4-5-20250929"
 url = "https://api.anthropic.com"
 key = "ANTHROPIC_API_KEY"
 type = "anthropic_messages"

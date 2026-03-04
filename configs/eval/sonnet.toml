@@ -1,0 +1,10 @@
+endpoints_path = "../endpoints.toml"
+
+endpoint_id = "sonnet"
+save_results = true
+num_examples = 20
+rollouts_per_example = 3
+
+[[eval]]
+env_id = "lswamina/connections"
+num_examples = 20
