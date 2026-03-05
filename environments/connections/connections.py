@@ -4,6 +4,7 @@ import random
 import re
 from pathlib import Path
 
+import anthropic
 import verifiers as vf
 from datasets import Dataset
 
@@ -14,11 +15,12 @@ Rules:
 - You have 4 mistakes allowed before the game ends
 - Win by correctly identifying all 4 groups
 
-Format each guess with XML tags:
+Before each guess, briefly explain WHY these 4 words belong together in <reason> tags, then provide your guess in <guess> tags:
+
+<reason>Brief explanation of what connects the 4 words</reason>
 <guess>WORD1, WORD2, WORD3, WORD4</guess>
 
-You may reason before your guess. Make exactly one guess per response."""
-
+Make exactly one guess per response."""
 
 def _build_rows(seed: int = 42) -> tuple[list[dict], list[dict]]:
     """Parse connections_data.csv and return (train_rows, eval_rows)."""
@@ -105,7 +107,7 @@ class ConnectionsEnv(vf.MultiTurnEnv):
         found_names = {g["name"] for g in state["found_groups"]}
         unfound_groups = [g for g in state["groups"] if g["name"] not in found_names]
 
-        # --- parse guess from last assistant message ---
+        # --- parse guess and reason from last assistant message ---
         last_content = ""
         for msg in reversed(messages):
             if msg.get("role") == "assistant":
@@ -113,12 +115,14 @@ class ConnectionsEnv(vf.MultiTurnEnv):
                 break
         parsed = self.parser.parse(last_content)
         guess_raw = getattr(parsed, "guess", None)
+        last_reason = (getattr(parsed, "reason", None) or "").strip()
 
-        def _mistake(reason: str) -> vf.Messages:
+        def _mistake(reason: str, guessed: list[str] | None = None) -> vf.Messages:
             state["mistakes"] += 1
             left = state["max_mistakes"] - state["mistakes"]
+            guess_line = f"Your incorrect guess: {', '.join(guessed)}\n" if guessed else ""
             if left <= 0:
-                msg = f"{reason} No mistakes remaining. Game over! You found {len(state['found_groups'])}/4 groups."
+                msg = f"{guess_line}{reason} No mistakes remaining. Game over! You found {len(state['found_groups'])}/4 groups."
                 state["final_env_response"] = [{"role": "user", "content": msg}]
                 return state["final_env_response"]
             s = "s" if left != 1 else ""
@@ -126,7 +130,7 @@ class ConnectionsEnv(vf.MultiTurnEnv):
                 {
                     "role": "user",
                     "content": (
-                        f"{reason} {left} mistake{s} remaining.\n\n"
+                        f"{guess_line}{reason} {left} mistake{s} remaining.\n\n"
                         f"Current words ({len(remaining)}): {', '.join(remaining)}"
                     ),
                 }
@@ -143,7 +147,8 @@ class ConnectionsEnv(vf.MultiTurnEnv):
 
         if len(guess_words) != 4:
             return _mistake(
-                f"Please guess exactly 4 words (you provided {len(guess_words)})."
+                f"Please guess exactly 4 words (you provided {len(guess_words)}).",
+                guessed=guess_words,
             )
 
         guess_set = frozenset(guess_words)
@@ -151,7 +156,8 @@ class ConnectionsEnv(vf.MultiTurnEnv):
         invalid = guess_set - frozenset(remaining)
         if invalid:
             return _mistake(
-                f"Word(s) not in current puzzle: {', '.join(sorted(invalid))}."
+                f"Word(s) not in current puzzle: {', '.join(sorted(invalid))}.",
+                guessed=guess_words,
             )
 
         # --- check against ground truth ---
@@ -161,7 +167,11 @@ class ConnectionsEnv(vf.MultiTurnEnv):
 
         if correct_group:
             state["found_groups"].append(
-                {"name": correct_group["name"], "level": correct_group["level"]}
+                {
+                    "name": correct_group["name"],
+                    "level": correct_group["level"],
+                    "reason": last_reason,
+                }
             )
             state["remaining_words"] = [
                 w for w in remaining if w not in guess_set
@@ -194,7 +204,7 @@ class ConnectionsEnv(vf.MultiTurnEnv):
             len(guess_set & set(g["words"])) == 3 for g in unfound_groups
         )
         prefix = "Incorrect. One away!" if one_away else "Incorrect."
-        return _mistake(prefix)
+        return _mistake(prefix, guessed=guess_words)
 
     @vf.stop
     async def game_won(self, state: vf.State) -> bool:
@@ -228,11 +238,49 @@ def load_environment(
     train_dataset = _make(train_rows, num_examples if split == "train" else -1)
     eval_dataset = _make(eval_rows, num_examples if split == "eval" else -1)
 
-    parser = vf.XMLParser(fields=["guess"])
+    parser = vf.XMLParser(fields=["reason", "guess"])
 
-    async def groups_solved_reward(state) -> float:
-        """0.25 per group found; 1.0 when all 4 are solved."""
-        return 0.25 * len(state.get("found_groups", []))
+    # Difficulty weights: level 0=1, 1=2, 2=3, 3=4 (sum=10 for a perfect game)
+    # Mistake penalty: -0.05 per mistake, clamped to [0, 1]
+    async def difficulty_weighted_reward(state) -> float:
+        found = state.get("found_groups", [])
+        mistakes = state.get("mistakes", 0)
+        group_score = sum((g["level"] + 1) / 10.0 for g in found)
+        penalty = 0.05 * mistakes
+        return max(0.0, group_score - penalty)
+
+    # LLM-as-judge: compare model's stated reason to the actual group name.
+    # Routes through Prime Intellect inference (PRIME_API_KEY) using gpt-4.1-nano.
+    async def semantic_reason_reward(state) -> float:
+        found = state.get("found_groups", [])
+        if not found:
+            return 0.0
+        client = anthropic.AsyncAnthropic()
+        scores = []
+        for group in found:
+            reason = group.get("reason", "").strip()
+            if not reason:
+                scores.append(0.0)
+                continue
+            prompt = (
+                f"Rate how well the model's reasoning matches the actual group theme.\n\n"
+                f"Group name: {group['name']}\n"
+                f"Model's reasoning: {reason}\n\n"
+                f"Rate from 0 to 10 where 0 = completely wrong, 5 = partially correct, "
+                f"10 = perfectly captures the theme. Output only a single integer."
+            )
+            try:
+                response = await client.messages.create(
+                    model="claude-haiku-4-5-20251001",
+                    max_tokens=10,
+                    messages=[{"role": "user", "content": prompt}],
+                )
+                score = int(response.content[0].text.strip()) / 10.0
+                score = max(0.0, min(1.0, score))
+            except Exception:
+                score = 0.5  # neutral fallback if judge fails
+            scores.append(score)
+        return sum(scores) / len(scores)
 
     async def mistakes_used_metric(state) -> float:
         return float(state.get("mistakes", 0))
@@ -246,7 +294,9 @@ def load_environment(
             return 0.0
         return sum(g["level"] for g in found) / len(found)
 
-    rubric = vf.Rubric(funcs=[groups_solved_reward], parser=parser)
+    rubric = vf.Rubric(
+        funcs=[difficulty_weighted_reward, semantic_reason_reward], parser=parser
+    )
     rubric.add_metric(mistakes_used_metric)
     rubric.add_metric(groups_found_metric)
     rubric.add_metric(avg_difficulty_solved_metric)

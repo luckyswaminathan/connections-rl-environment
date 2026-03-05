@@ -2,3 +2,5 @@
 # outputs from `prime eval run`
 ./outputs
 ./environments/*/outputs
+./secrets.envsecrets.env
+secrets2.env
