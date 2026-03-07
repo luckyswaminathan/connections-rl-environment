@@ -21,59 +21,69 @@ Before each guess, briefly explain WHY these 4 words belong together in <reason>
 
 Make exactly one guess per response."""
 
-def _build_rows(seed: int = 42) -> tuple[list[dict], list[dict]]:
-    """Parse connections_data.csv and return (train_rows, eval_rows)."""
-    csv_path = Path(__file__).parent / "connections_data.csv"
+def _build_rows(seed: int = 42, train_shuffles: int = 4) -> tuple[list[dict], list[dict]]:
+    """Parse connections_data.csv and return (train_rows, eval_rows).
+
+    Each training puzzle is shuffled train_shuffles times to augment the dataset.
+    Eval puzzles get a single canonical shuffle.
+    """
+    csv_paths = [Path(__file__).parent / "connections_data.csv"]
+    synthetic_path = Path(__file__).parent / "synthetic_puzzles.csv"
+    if synthetic_path.exists() and synthetic_path.stat().st_size > 0:
+        csv_paths.append(synthetic_path)
 
     puzzles: dict[str, dict] = {}
-    with open(csv_path, newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            gid = row["Game ID"]
-            if gid not in puzzles:
-                puzzles[gid] = {
-                    "game_id": gid,
-                    "date": row["Puzzle Date"],
-                    "words": [],
-                    "groups": {},
-                }
-            puzzles[gid]["words"].append(row["Word"])
-            gname = row["Group Name"]
-            if gname not in puzzles[gid]["groups"]:
-                puzzles[gid]["groups"][gname] = {
-                    "name": gname,
-                    "level": int(row["Group Level"]),
-                    "words": [],
-                }
-            puzzles[gid]["groups"][gname]["words"].append(row["Word"])
+    for csv_path in csv_paths:
+        with open(csv_path, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                gid = row["Game ID"]
+                if gid not in puzzles:
+                    puzzles[gid] = {
+                        "game_id": gid,
+                        "date": row["Puzzle Date"],
+                        "words": [],
+                        "groups": {},
+                    }
+                puzzles[gid]["words"].append(row["Word"])
+                gname = row["Group Name"]
+                if gname not in puzzles[gid]["groups"]:
+                    puzzles[gid]["groups"][gname] = {
+                        "name": gname,
+                        "level": int(row["Group Level"]),
+                        "words": [],
+                    }
+                puzzles[gid]["groups"][gname]["words"].append(row["Word"])
 
     rng = random.Random(seed)
     train_rows: list[dict] = []
     eval_rows: list[dict] = []
 
     for puzzle in puzzles.values():
-        words = list(puzzle["words"])
-        rng.shuffle(words)
         groups = list(puzzle["groups"].values())
+        is_eval = puzzle["date"].startswith("2025")
+        n_shuffles = 1 if is_eval else train_shuffles
 
-        question = (
-            f"The 16 words are:\n{', '.join(words)}\n\n"
-            "Find the 4 groups of 4 related words. Make your first guess."
-        )
-        info = json.dumps(
-            {
-                "game_id": puzzle["game_id"],
-                "date": puzzle["date"],
-                "shuffled_words": words,
-                "groups": groups,
-            }
-        )
-        row = {"question": question, "info": info}
-
-        if puzzle["date"].startswith("2025"):
-            eval_rows.append(row)
-        else:
-            train_rows.append(row)
+        for i in range(n_shuffles):
+            words = list(puzzle["words"])
+            rng.shuffle(words)
+            question = (
+                f"The 16 words are:\n{', '.join(words)}\n\n"
+                "Find the 4 groups of 4 related words. Make your first guess."
+            )
+            info = json.dumps(
+                {
+                    "game_id": puzzle["game_id"],
+                    "date": puzzle["date"],
+                    "shuffled_words": words,
+                    "groups": groups,
+                }
+            )
+            row = {"question": question, "info": info}
+            if is_eval:
+                eval_rows.append(row)
+            else:
+                train_rows.append(row)
 
     return train_rows, eval_rows
 
