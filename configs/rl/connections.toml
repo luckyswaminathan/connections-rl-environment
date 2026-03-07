@@ -1,12 +1,12 @@
-model = "Qwen/Qwen3-4B-Instruct-2507"
-max_steps = 300
+model = "Qwen/Qwen3-30B-A3B-Instruct-2507"
+max_steps = 80
 batch_size = 128
 rollouts_per_example = 8
 oversampling_factor = 2.0
-env_file = ["../../secrets.env"]  # provides PRIME_API_KEY to LLM judge on remote workers
+env_file = ["secrets.env"]
 
 [sampling]
-max_tokens = 2048
+max_tokens = 1024
 
 [[env]]
 id = "lswamina/connections"
@@ -19,8 +19,8 @@ name = "qwen3-8b-connections-v1"
 
 # Online eval every 50 steps against held-out 2025 puzzles
 [eval]
-interval = 50
-num_examples = 30
+interval = 40
+num_examples = 20
 rollouts_per_example = 1
 
 [[eval.env]]
@@ -30,6 +30,4 @@ args = { split = "eval" }
 # Difficulty filtering: skip examples the model already solves reliably (reward > 0.9)
 # or can never solve (reward < 0.05). Keeps training signal meaningful.
 [buffer]
-online_difficulty_filtering = true
-easy_threshold = 0.9
-hard_threshold = 0.05
+online_difficulty_filtering = false

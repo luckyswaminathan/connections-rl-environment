@@ -4,3 +4,4 @@
 ./environments/*/outputs
 ./secrets.envsecrets.env
 secrets2.env
+configs/rl/secrets.env

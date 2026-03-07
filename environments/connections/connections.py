@@ -4,7 +4,6 @@ import random
 import re
 from pathlib import Path
 
-import anthropic
 import verifiers as vf
 from datasets import Dataset
 
@@ -240,47 +239,14 @@ def load_environment(
 
     parser = vf.XMLParser(fields=["reason", "guess"])
 
-    # Difficulty weights: level 0=1, 1=2, 2=3, 3=4 (sum=10 for a perfect game)
-    # Mistake penalty: -0.05 per mistake, clamped to [0, 1]
+    # Difficulty-weighted correctness (Yellow=0.1, Green=0.2, Blue=0.3, Purple=0.4)
+    # Perfect game = 1.0; each mistake costs 0.1 (max penalty 0.4)
     async def difficulty_weighted_reward(state) -> float:
         found = state.get("found_groups", [])
         mistakes = state.get("mistakes", 0)
         group_score = sum((g["level"] + 1) / 10.0 for g in found)
-        penalty = 0.05 * mistakes
+        penalty = 0.1 * mistakes
         return max(0.0, group_score - penalty)
-
-    # LLM-as-judge: compare model's stated reason to the actual group name.
-    # Routes through Prime Intellect inference (PRIME_API_KEY) using gpt-4.1-nano.
-    async def semantic_reason_reward(state) -> float:
-        found = state.get("found_groups", [])
-        if not found:
-            return 0.0
-        client = anthropic.AsyncAnthropic()
-        scores = []
-        for group in found:
-            reason = group.get("reason", "").strip()
-            if not reason:
-                scores.append(0.0)
-                continue
-            prompt = (
-                f"Rate how well the model's reasoning matches the actual group theme.\n\n"
-                f"Group name: {group['name']}\n"
-                f"Model's reasoning: {reason}\n\n"
-                f"Rate from 0 to 10 where 0 = completely wrong, 5 = partially correct, "
-                f"10 = perfectly captures the theme. Output only a single integer."
-            )
-            try:
-                response = await client.messages.create(
-                    model="claude-haiku-4-5-20251001",
-                    max_tokens=10,
-                    messages=[{"role": "user", "content": prompt}],
-                )
-                score = int(response.content[0].text.strip()) / 10.0
-                score = max(0.0, min(1.0, score))
-            except Exception:
-                score = 0.5  # neutral fallback if judge fails
-            scores.append(score)
-        return sum(scores) / len(scores)
 
     async def mistakes_used_metric(state) -> float:
         return float(state.get("mistakes", 0))
@@ -294,9 +260,7 @@ def load_environment(
             return 0.0
         return sum(g["level"] for g in found) / len(found)
 
-    rubric = vf.Rubric(
-        funcs=[difficulty_weighted_reward, semantic_reason_reward], parser=parser
-    )
+    rubric = vf.Rubric(funcs=[difficulty_weighted_reward], parser=parser)
     rubric.add_metric(mistakes_used_metric)
     rubric.add_metric(groups_found_metric)
     rubric.add_metric(avg_difficulty_solved_metric)
@@ -307,5 +271,5 @@ def load_environment(
         rubric=rubric,
         parser=parser,
         system_prompt=SYSTEM_PROMPT,
-        max_turns=12,
+        max_turns=8,
     )
