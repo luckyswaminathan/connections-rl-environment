@@ -91,6 +91,7 @@ Rules:
 - All 16 words must be unique within the puzzle
 - Single words preferred; short 2-word phrases (e.g. "LOST BOYS") are fine if well-known
 - Be creative and original — do not reuse exact themes from the examples
+- NEVER name groups "TYPES OF X", "KINDS OF X", or "THINGS THAT ARE X" — use specific evocative names like the real NYT puzzles do: "___ CHEESE", "FIRE ___", "FAMOUS MIKES", "PALINDROMES".
 - Level 0 should always have a clean, unambiguous connection as the easy entry point.
 - Level 3 should use wordplay like: celebrity last names sharing a first name, hidden
   preceding/following word (e.g. "FIRE ___"), words that follow/precede a common word,
@@ -104,9 +105,9 @@ def generate_prompt(examples: list[dict], blocked_themes: set[str]) -> str:
         f"Example {i+1}:\n{format_puzzle_for_prompt(p)}"
         for i, p in enumerate(examples)
     )
-    # Show a sample of blocked themes so the model avoids them
-    blocked_sample = sorted(blocked_themes)[:150]
-    blocked_text = ", ".join(blocked_sample)
+    # Show a random sample of blocked themes so the model avoids them
+    blocked_sample = random.sample(sorted(blocked_themes), min(300, len(blocked_themes)))
+    blocked_text = ", ".join(sorted(blocked_sample))
     return f"""Here are {len(examples)} real NYT Connections puzzles for reference:
 
 {example_text}
@@ -115,6 +116,7 @@ ALREADY USED THEMES (do NOT reuse any of these, not even close variations):
 {blocked_text}
 
 Now create a brand new puzzle with completely original themes not in the list above.
+Pick an unusual, specific angle — avoid food, fruit, cheese, pasta, breakfast, kitchen, sports, or any generic "TYPES OF X" framing. Think wordplay, celebrity names, hidden words, pop culture, geography, science, history.
 Before outputting, verify: (1) no word appears in more than one group, (2) all group names are original.
 
 Output ONLY valid JSON in this exact format:
@@ -196,6 +198,29 @@ async def generate_puzzle(client: anthropic.AsyncAnthropic, examples: list[dict]
     except Exception as e:
         print(f"  [generate error] {e}", file=sys.stderr)
         return None
+
+
+async def themes_are_novel(client: anthropic.AsyncAnthropic, new_themes: list[str], blocked_themes: set[str]) -> bool:
+    """Quick Haiku call: returns True if none of new_themes are semantically similar to blocked_themes."""
+    # Only send a sample of blocked themes to keep prompt short
+    sample = sorted(blocked_themes)[:200]
+    prompt = (
+        f"New themes: {', '.join(new_themes)}\n\n"
+        f"Existing themes: {', '.join(sample)}\n\n"
+        "Are any of the new themes semantically equivalent or nearly identical to an existing theme? "
+        "Reply with just YES or NO."
+    )
+    try:
+        resp = await client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=5,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        answer = resp.content[0].text.strip().upper()
+        return not answer.startswith("YES")
+    except Exception as e:
+        print(f"  [theme-check error] {e}", file=sys.stderr)
+        return True  # assume novel on error, let validator decide
 
 
 async def validate_puzzle(client: anthropic.AsyncAnthropic, groups: list[dict]) -> dict | None:
@@ -301,8 +326,10 @@ async def main(n: int, out_path: Path, examples_per_prompt: int = 5):
                     consecutive_failures += 1
                 else:
                     new_themes = {g["name"].upper() for g in groups}
-                    if new_themes & used_themes:
-                        print(f"duplicate theme(s): {new_themes & used_themes}")
+                    overlap = new_themes & used_themes
+                    if overlap:
+                        print(f"duplicate theme(s): {overlap}")
+                        used_themes.update(new_themes)  # block all themes from this attempt
                         consecutive_failures += 1
                     else:
                         print("validating...", end=" ", flush=True)
