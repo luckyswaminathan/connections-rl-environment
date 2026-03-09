@@ -1,5 +1,5 @@
 model = "Qwen/Qwen3-30B-A3B-Thinking-2507"
-max_steps = 80
+max_steps = 120
 batch_size = 128
 rollouts_per_example = 8
 oversampling_factor = 2.0
@@ -15,7 +15,7 @@ args = { split = "train" }
 [wandb]
 entity = "lakshman-swaminathan1-university-of-pennsylvania"
 project = "connections"
-name = "qwen3-30b-thinking-4x-augment"
+name = "qwen3-30b-thinking-synthetic-120steps"
 
 # Online eval every 50 steps against held-out 2025 puzzles
 [eval]
