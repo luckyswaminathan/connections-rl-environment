@@ -290,7 +290,8 @@ async def main(n: int, out_path: Path, examples_per_prompt: int = 5):
     if out_path.exists() and out_path.stat().st_size > 0:
         syn_puzzles = load_existing_puzzles(out_path)
         used_themes |= {g["name"].upper() for p in syn_puzzles for g in p["groups"]}
-        next_id = len(syn_puzzles) + 1
+        max_id = max((int(p["game_id"].split("-")[1]) for p in syn_puzzles), default=0)
+        next_id = max_id + 1
     else:
         next_id = 1
 
