@@ -1,12 +1,12 @@
 model = "Qwen/Qwen3-30B-A3B-Thinking-2507"
-max_steps = 120
+max_steps = 100
 batch_size = 128
 rollouts_per_example = 8
 oversampling_factor = 2.0
 env_file = ["secrets.env"]
 
 [sampling]
-max_tokens = 4096
+max_tokens = 16384
 
 [[env]]
 id = "lswamina/connections"
@@ -16,16 +16,6 @@ args = { split = "train" }
 entity = "lakshman-swaminathan1-university-of-pennsylvania"
 project = "connections"
 name = "qwen3-30b-thinking-synthetic-120steps"
-
-# Online eval every 50 steps against held-out 2025 puzzles
-[eval]
-interval = 40
-num_examples = 20
-rollouts_per_example = 1
-
-[[eval.env]]
-id = "lswamina/connections"
-args = { split = "eval" }
 
 # Difficulty filtering: skip examples the model already solves reliably (reward > 0.9)
 # or can never solve (reward < 0.05). Keeps training signal meaningful.

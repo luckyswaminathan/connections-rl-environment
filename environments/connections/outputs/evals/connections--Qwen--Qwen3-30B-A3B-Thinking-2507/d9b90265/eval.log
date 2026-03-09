@@ -1,0 +1,7 @@
+2026-03-08 20:45:59 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Initializing ZMQEnvServer to serve connections (env_args={}, extra_env_kwargs={})
+2026-03-08 20:45:59 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Loading environment connections with env_args={}
+2026-03-08 20:45:59 - verifiers.utils.env_utils - INFO - Loading environment: connections
+2026-03-08 20:45:59 - verifiers.utils.env_utils - INFO - Using default args: seed=42, num_examples=-1, split='train'
+2026-03-08 20:46:00 - verifiers.utils.env_utils - INFO - Successfully lo2aded environment 'connections'
+2026-03-08 20:46:00 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - ZMQEnvServer started on tcp://127.0.0.1:58159
+22

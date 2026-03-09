@@ -1,0 +1,12 @@
+2026-03-08 21:24:18 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Initializing ZMQEnvServer to serve connections (env_args={'split': 'eval'}, extra_env_kwargs={})
+2026-03-08 21:24:18 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Loading environment connections with env_args={'split': 'eval'}
+2026-03-08 21:24:18 - verifiers.utils.env_utils - INFO - Loading environment: connections
+2026-03-08 21:24:18 - verifiers.utils.env_utils - INFO - Using provided args: split=eval
+2026-03-08 21:24:18 - verifiers.utils.env_utils - INFO - Using default args: num_examples=-1, seed=42
+2026-03-08 21:24:19 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'connections'
+2026-03-08 21:24:19 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - ZMQEnvServer started on tcp://127.0.0.1:59936
+2026-03-09 11:54:01 - verifiers.envs.environment.ConnectionsEnv - ERROR - Aborted rollout due to ModelError() -> APITimeoutError('Request timed out.') -> ConnectTimeout('') -> ConnectTimeout(TimeoutError())
+2026-03-09 12:00:01 - verifiers.envs.environment.ConnectionsEnv - ERROR - Aborted rollout due to ModelError() -> APIConnectionError('Connection error.') -> RemoteProtocolError('Server disconnected without sending a response.') -> RemoteProtocolError('Server disconnected without sending a response.')
+2026-03-09 12:17:26 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Received signal SIGTERM, initiating graceful shutdown
+2026-03-09 12:17:26 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Stop event received, shutting down gracefully
+2026-03-09 12:17:26 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Environment server shut down

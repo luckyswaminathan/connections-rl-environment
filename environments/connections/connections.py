@@ -281,5 +281,5 @@ def load_environment(
         rubric=rubric,
         parser=parser,
         system_prompt=SYSTEM_PROMPT,
-        max_turns=8,
+        max_turns=16,
     )
