@@ -17,13 +17,13 @@ To augment the training set beyond the ~735 real pre-2025 puzzles, a generate �
 
 1. **Generate** (`scripts/generate_puzzles.py`): Claude Haiku generates candidate puzzles few-shot from real examples drawn from the existing dataset (RAG-style context). Each candidate has 4 groups of 4 words across Yellow/Green/Blue/Purple difficulty levels, with a descriptive category name and an explanation of what connects each group.
 
-2. **Verify** (`scripts/verify_puzzles.py`): A second Haiku call validates each generated group for:
+2. **Verify** (`scripts/generate_puzzles.py` + `scripts/verify_puzzles.py`): Claude Sonnet validates each generated puzzle, checking each group for:
    - **Clarity** — the category name unambiguously describes the connection
    - **Exclusivity** — no word plausibly belongs to multiple groups
    - **Accuracy** — all words genuinely fit the stated category (including wordplay/prefix/suffix categories)
    - Structural checks: exact 4 words per group, no duplicates, no overlap with existing puzzles
 
-3. **Fix** (`scripts/fix_puzzles.py`): Puzzles that fail verification are repaired (bad groups swapped out, words corrected) rather than discarded, improving yield.
+3. **Fix** (`scripts/fix_puzzles.py`): Puzzles that fail verification are repaired by Claude Sonnet (bad groups swapped out, words corrected) rather than discarded, improving yield.
 
 Passing puzzles are appended to `synthetic_puzzles.csv` and automatically included in training builds.
 
