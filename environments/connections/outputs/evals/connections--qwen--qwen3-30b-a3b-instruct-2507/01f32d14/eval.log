@@ -1,0 +1,10 @@
+2026-03-09 13:07:02 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Initializing ZMQEnvServer to serve connections (env_args={'split': 'eval'}, extra_env_kwargs={})
+2026-03-09 13:07:02 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Loading environment connections with env_args={'split': 'eval'}
+2026-03-09 13:07:02 - verifiers.utils.env_utils - INFO - Loading environment: connections
+2026-03-09 13:07:02 - verifiers.utils.env_utils - INFO - Using provided args: split=eval
+2026-03-09 13:07:02 - verifiers.utils.env_utils - INFO - Using default args: seed=42, num_examples=-1
+2026-03-09 13:07:02 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'connections'
+2026-03-09 13:07:02 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - ZMQEnvServer started on tcp://127.0.0.1:53807
+2026-03-09 13:13:36 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Received signal SIGTERM, initiating graceful shutdown
+2026-03-09 13:13:36 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Stop event received, shutting down gracefully
+2026-03-09 13:13:36 - verifiers.workers.server.env_server.ZMQEnvServer - INFO - Environment server shut down
