@@ -20,4 +20,6 @@ name = "qwen3-30b-thinking-synthetic-120steps"
 # Difficulty filtering: skip examples the model already solves reliably (reward > 0.9)
 # or can never solve (reward < 0.05). Keeps training signal meaningful.
 [buffer]
-online_difficulty_filtering = false
+online_difficulty_filtering = true
+easy_threshold = 0.85
+hard_threshold = 0.05

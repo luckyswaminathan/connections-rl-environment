@@ -252,33 +252,38 @@ def load_environment(
     # Difficulty-weighted correctness (Yellow=0.1, Green=0.2, Blue=0.3, Purple=0.4)
     # Perfect game = 1.0; each mistake costs 0.1 (max penalty 0.4)
     # Mild thinking-length penalty discourages runaway <think> traces.
-    _THINK_PENALTY_PER_TOKEN = 0.00005
+    _THINK_PENALTY_PER_TOKEN = 0.000005
+
+    def _count_thinking_tokens(state) -> int:
+        """Count thinking tokens across all assistant messages.
+
+        Handles both structured content blocks (Qwen3-style) and plain-text
+        <think>...</think> tags.
+        """
+        total = 0
+        for msg in state.get("messages", []):
+            if msg.get("role") != "assistant":
+                continue
+            content = msg.get("content") or ""
+            if isinstance(content, list):
+                for block in content:
+                    if isinstance(block, dict) and block.get("type") == "thinking":
+                        total += len((block.get("thinking") or "").split())
+            else:
+                for m in re.finditer(r"<think>(.*?)</think>", content, re.DOTALL):
+                    total += len(m.group(1).split())
+        return total
 
     async def difficulty_weighted_reward(state) -> float:
         found = state.get("found_groups", [])
         mistakes = state.get("mistakes", 0)
         group_score = sum((g["level"] + 1) / 10.0 for g in found)
-        penalty = 0.1 * mistakes
-
-        # Count thinking tokens across all assistant messages
-        thinking_tokens = 0
-        for msg in state.get("messages", []):
-            if msg.get("role") == "assistant":
-                content = msg.get("content") or ""
-                for m in re.finditer(r"<think>(.*?)</think>", content, re.DOTALL):
-                    thinking_tokens += len(m.group(1).split())
-
-        think_penalty = _THINK_PENALTY_PER_TOKEN * thinking_tokens
+        penalty = 0.05 * mistakes
+        think_penalty = _THINK_PENALTY_PER_TOKEN * _count_thinking_tokens(state)
         return max(0.0, group_score - penalty - think_penalty)
 
     async def thinking_tokens_metric(state) -> float:
-        total = 0
-        for msg in state.get("messages", []):
-            if msg.get("role") == "assistant":
-                content = msg.get("content") or ""
-                for m in re.finditer(r"<think>(.*?)</think>", content, re.DOTALL):
-                    total += len(m.group(1).split())
-        return float(total)
+        return float(_count_thinking_tokens(state))
 
     async def mistakes_used_metric(state) -> float:
         return float(state.get("mistakes", 0))
