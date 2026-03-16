@@ -257,19 +257,28 @@ def load_environment(
     def _count_thinking_tokens(state) -> int:
         """Count thinking tokens across all assistant messages.
 
-        Handles both structured content blocks (Qwen3-style) and plain-text
-        <think>...</think> tags.
+        Handles three formats:
+        1. reasoning_content field (vLLM-served Qwen3 via OpenAI-compat API)
+        2. Structured content blocks: [{"type": "thinking", "thinking": "..."}]
+        3. Plain-text <think>...</think> tags
         """
         total = 0
         for msg in state.get("messages", []):
             if msg.get("role") != "assistant":
                 continue
+            # Format 1: reasoning_content field
+            reasoning = msg.get("reasoning_content") or ""
+            if reasoning:
+                total += len(reasoning.split())
+                continue
             content = msg.get("content") or ""
             if isinstance(content, list):
+                # Format 2: structured content blocks
                 for block in content:
                     if isinstance(block, dict) and block.get("type") == "thinking":
                         total += len((block.get("thinking") or "").split())
             else:
+                # Format 3: plain-text tags
                 for m in re.finditer(r"<think>(.*?)</think>", content, re.DOTALL):
                     total += len(m.group(1).split())
         return total
